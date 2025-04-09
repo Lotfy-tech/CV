@@ -12,4 +12,4 @@ Made with:
 <li> CSS variables</li>
   </ul>
 
-Want to view the site? Here is the <a href="https://andrevwv.github.io/cv.io/">link</a>.
+Want to view the site? Here is the <a href="#">link</a>.
