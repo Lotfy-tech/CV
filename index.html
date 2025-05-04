@@ -1,213 +1,284 @@
-﻿    <!DOCTYPE html>
-<html dir="ltr" lang="en">
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta content="ie=edge" http-equiv="x-ua-compatible">
-    <meta content="width=device-width, initial-scale=1" name="viewport">
-    <link href="css/reset.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Scada:400,700&amp;subset=cyrillic" rel="stylesheet">
-    <link href="favicon.ico" rel="shortcut icon" type="image/x-icon">
-    <title>Lotfy Waheed || Animated CV</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        
+        #game-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            border: 2px solid #333;
+            background-color: #fff;
+            margin-bottom: 20px;
+        }
+        
+        .snake-part {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: #4CAF50;
+            border: 1px solid #45a049;
+        }
+        
+        .food {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: #f44336;
+            border-radius: 50%;
+        }
+        
+        #controls {
+            display: grid;
+            grid-template-areas:
+                ". up ."
+                "left down right";
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .arrow-btn {
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .arrow-btn:active {
+            background-color: #555;
+        }
+        
+        #up {
+            grid-area: up;
+        }
+        
+        #left {
+            grid-area: left;
+        }
+        
+        #down {
+            grid-area: down;
+        }
+        
+        #right {
+            grid-area: right;
+        }
+        
+        #score {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
 </head>
-
 <body>
-    <div class="background"></div>
-    <div class="theme">
-        <a class="theme__color-button" data-id="red" tabindex="0">
-            <span tabindex="-1">Red</span>
-        </a>
-        <a class="theme__color-button" data-id="gray" tabindex="0">
-            <span tabindex="-1">Gray</span>
-        </a>
-        <a class="theme__color-button" data-id="blue" tabindex="0">
-            <span tabindex="-1">Blue</span>
-        </a>
-        <a class="theme__color-button" data-id="green" tabindex="0">
-            <span tabindex="-1">Green</span>
-        </a>
+    <h1>Snake Game</h1>
+    <div id="game-container"></div>
+    <div id="score">Score: 0</div>
+    <div id="controls">
+        <button class="arrow-btn" id="up">↑</button>
+        <button class="arrow-btn" id="left">←</button>
+        <button class="arrow-btn" id="down">↓</button>
+        <button class="arrow-btn" id="right">→</button>
     </div>
-    <div class="main">
-        <header>
-            <ul class="menu">
-                <li tabindex="0">
-                    <a class="menu__button profile__button menu__button--current" data-id="profile" tabindex="-1">
-                        <span class="icon menu__icon icon-profile">&#xe804;</span>
-                        <span class="menu__button__text">Profile</span>
-                    </a>
-                </li>
-                <li tabindex="0">
-                    <a class="menu__button education__button" data-id="education" tabindex="-1">
-                        <span class="icon menu__icon icon-education">&#xe803;</span>
-                        <span class="menu__button__text">Experience</span>
-                    </a>
-                </li>
-                <li tabindex="0">
-                    <a class="menu__button skills__button" data-id="skills" tabindex="-1">
-                        <span class="icon menu__icon icon-skills">&#xe801;</span>
-                        <span class="menu__button__text">Personal Preference</span>
-                    </a>
-                </li>
-                <li tabindex="0">
-                    <a class="menu__button experience__button" data-id="experience" tabindex="-1">
-                        <span class="icon menu__icon icon-experiance">&#xe802;</span>
-                        <span class="menu__button__text">ِAwards</span>
-                    </a>
-                </li>
-            </ul>
-        </header>
-        <div class="content">
-            <div class="content__profile">
-                <div class="photo">
-                    <img alt="My photo" class="main__photo" height="170" src="./alfy.jpg" width="170">
-                </div>
-                <h1>Lotfy Waheed Lotfy Ali</h1>
-                <p>Professional Programmer (Full-Stack Dev) <br>
-                    <span class="highlight"> & DBS Moderator</span> Cpane Maker, </p>
-                <h3>Main Details</h3>
-                <li>Single</li>
-                <li>Male</li>
-                <li>Egyptian</li>
-                <li id="list">26-5-2005</li>
-                <h3>Education</h3>
-                <h2 id="h22">Faculty Of Education</h2>
-            </div>
-            <div class="content__education disabled">
-                <div class="box-item">
-                    <span class="icon box-item__education__image">&#xe806;</span>
-                    <div class="box-item__text">
-                        <span class="box-item__years"> 2023 -> Now</span>
-                        <span class="box-item__place">Intro in Data Encryption & Hashing</span>
-                    </div>
-                </div>
-                <div class="box-item">
-                    <span class="icon box-item__education__image">&#xe806;</span>
-                    <div class="box-item__text">
-                        <span class="box-item__years"> 2022 —>  2024</span>
-                        <span class="box-item__place">Complete the Back-End Track Course + Intro In Data Analysis &nbsp; (with Python) </span>
-                            
-                    </div>
-                </div>
-                <div class="box-item">
-                    <span class="icon box-item__education__image">&#xe806;</span>
-                    <div class="box-item__text">
-                        <span class="box-item__years"> 2020 —>  2023</span>
-                        <span class="box-item__place">Intro In Back-End Track <br> (PHP + (Laravel))&nbsp;(MySQL)
-                            <br> </span>
-                    </div>
-                </div>
-                <div class="box-item">
-                    <span class="icon box-item__education__image">&#xe806;</span>
-                    <div class="box-item__text">
-                        <span class="box-item__years"> 2020 —> 2022</span>
-                        <span class="box-item__place">
-                            Development in some frameworks such as: <br>
-                             Tailwind and Bootstrap IN CSS3 <br>
-                             react.Js & Node.JS & Express.Js in JS 
-                            <br></span>
-                    </div>
-                </div>
-                <div class="box-item">
-                    <span class="icon box-item__education__image">&#xe806;</span>
-                    <div class="box-item__text">
-                        <span class="box-item__years"> 2019 —>  2021</span>
-                        <span class="box-item__place">Couse in PHP & MYSQL + Setting Up Servers
-                            <br></span>
-                    </div>
-                </div>
-                <div class="box-item">
-                    <span class="icon box-item__education__image">&#xe806;</span>
-                    <div class="box-item__text">
-                        <span class="box-item__years"> 2018 —>  2020</span>
-                        <span class="box-item__place">complete Course in (JS) & Intro in (C++)<br></span>
-                    </div>
-                </div>
-                <div class="box-item">
-                    <span class="icon box-item__education__image">&#xe806;</span>
-                    <div class="box-item__text">
-                        <span class="box-item__years"> 2017 —>  2019</span>
-                        <span class="box-item__place">Intro In JS & Python   <br></span>
-                    </div>
-                </div>
-                <div class="box-item">
-                    <span class="icon box-item__education__image">&#xe806;</span>
-                    <div class="box-item__text">
-                        <span class="box-item__years"> 2017 —> 2017</span>
-                        <span class="box-item__place">
-                            Course HTML5 & CSS3<br></span>
-                    </div>
-                </div>
-            </div>
-            <div class="content__skills disabled">
-                <div class="skill-item html5-item" onclick="">
-                   
-                    <div class="details">
-                        <span class="skill-name">Team Spirit</span>
-                        <ul class="skill-knowlage">
-                            <li>Team spirit among Developers is essential for a smooth and efficient operation</li>
-                            
-                        </ul>
-                    </div>
-                </div>
-                <div class="skill-item css-item" onclick="">
-                   
-                    <div class="details">
-                        <span class="skill-name">Flexibility</span>
-                        <ul class="skill-knowlage">
-                            <li>Flexibility for developers includes adapting to changing labor market requirements.</li>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const gameContainer = document.getElementById('game-container');
+            const scoreDisplay = document.getElementById('score');
+            const upBtn = document.getElementById('up');
+            const leftBtn = document.getElementById('left');
+            const downBtn = document.getElementById('down');
+            const rightBtn = document.getElementById('right');
             
-                        </ul>
-                    </div>
-                </div>
-                <div class="skill-item java-item" onclick="">
-                   
-                    <div class="details">
-                        <span class="skill-name">Work Hard</span>
-                        <ul class="skill-knowlage">
-                            <li>Hard work in Developers means consistently putting in the effort, dedication</li>
-                        
-                        </ul>
-                    </div>
-                </div>
-                <div class="skill-item javascript-item" onclick="">
-                    
-                    <div class="details">
-                        <span style="font-size: 22px;" class="skill-name">Mind Map Planning</span>
-                        <ul class="skill-knowlage">
-                            <li>One of the most important talents a developer must have is planning the project according to the client's requirements.</li>
-                          
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="content__experience disabled">
+            const gridSize = 20;
+            const containerWidth = gameContainer.clientWidth;
+            const containerHeight = gameContainer.clientHeight;
+            const gridWidth = Math.floor(containerWidth / gridSize);
+            const gridHeight = Math.floor(containerHeight / gridSize);
+            
+            let snake = [{x: 10, y: 10}];
+            let food = generateFood();
+            let direction = 'right';
+            let nextDirection = 'right';
+            let score = 0;
+            let gameSpeed = 150;
+            let gameInterval;
+            
+            function generateFood() {
+                let foodPosition;
+                do {
+                    foodPosition = {
+                        x: Math.floor(Math.random() * gridWidth),
+                        y: Math.floor(Math.random() * gridHeight)
+                    };
+                } while (snake.some(part => part.x === foodPosition.x && part.y === foodPosition.y));
                 
+                return foodPosition;
+            }
             
-                <div class="box-item">
-                    <span class="icon experience-image">&#xe802;</span>
-                    <div class="box-item__text">
-                        <span class="box-item__years">Until Now There isn't any Official Awards </span>
-                        <span class="box-item__place">
-                        </span>
-                        <p></p>
-                        <ul class="box-item__responsibilities">
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="mail-address">
-            LotfyMosca@gmail.com
-        </div>
-        <footer>
-            <a class="icon social-icons mail" href="mailto:Lotfymosca@gmail.com">&#xe808;</a>
-            <a class="icon social-icons facebook" href="https://www.facebook.com/moscalotfy" target="_blank">&#xe807;</a>
-            <a class="icon social-icons facebook" href="tel:+01157269183" target="_blank">&#xe804;</a>
-     </footer>
-    </div>
-    <script src="main.js">
+            function updateGame() {
+                // Update direction
+                direction = nextDirection;
+                
+                // Move snake
+                const head = {...snake[0]};
+                
+                switch (direction) {
+                    case 'up':
+                        head.y -= 1;
+                        break;
+                    case 'down':
+                        head.y += 1;
+                        break;
+                    case 'left':
+                        head.x -= 1;
+                        break;
+                    case 'right':
+                        head.x += 1;
+                        break;
+                }
+                
+                // Check for collision with walls
+                if (head.x < 0 || head.x >= gridWidth || head.y < 0 || head.y >= gridHeight) {
+                    gameOver();
+                    return;
+                }
+                
+                // Check for collision with self
+                if (snake.some(part => part.x === head.x && part.y === head.y)) {
+                    gameOver();
+                    return;
+                }
+                
+                // Add new head
+                snake.unshift(head);
+                
+                // Check if snake ate food
+                if (head.x === food.x && head.y === food.y) {
+                    score += 10;
+                    scoreDisplay.textContent = `Score: ${score}`;
+                    food = generateFood();
+                    
+                    // Increase speed slightly every 50 points
+                    if (score % 50 === 0 && gameSpeed > 50) {
+                        gameSpeed -= 10;
+                        clearInterval(gameInterval);
+                        gameInterval = setInterval(updateGame, gameSpeed);
+                    }
+                } else {
+                    // Remove tail if no food eaten
+                    snake.pop();
+                }
+                
+                renderGame();
+            }
+            
+            function renderGame() {
+                // Clear game container
+                gameContainer.innerHTML = '';
+                
+                // Render snake
+                snake.forEach((part, index) => {
+                    const snakePart = document.createElement('div');
+                    snakePart.className = 'snake-part';
+                    snakePart.style.left = `${part.x * gridSize}px`;
+                    snakePart.style.top = `${part.y * gridSize}px`;
+                    
+                    // Make head slightly different
+                    if (index === 0) {
+                        snakePart.style.backgroundColor = '#2E7D32';
+                    }
+                    
+                    gameContainer.appendChild(snakePart);
+                });
+                
+                // Render food
+                const foodElement = document.createElement('div');
+                foodElement.className = 'food';
+                foodElement.style.left = `${food.x * gridSize}px`;
+                foodElement.style.top = `${food.y * gridSize}px`;
+                gameContainer.appendChild(foodElement);
+            }
+            
+            function gameOver() {
+                clearInterval(gameInterval);
+                alert("خسرتي يا عزة");
+                resetGame();
+            }
+            
+            function resetGame() {
+                snake = [{x: 10, y: 10}];
+                direction = 'right';
+                nextDirection = 'right';
+                score = 0;
+                gameSpeed = 150;
+                scoreDisplay.textContent = `Score: ${score}`;
+                food = generateFood();
+                clearInterval(gameInterval);
+                gameInterval = setInterval(updateGame, gameSpeed);
+                renderGame();
+            }
+            
+            // Event listeners for arrow buttons
+            upBtn.addEventListener('click', () => {
+                if (direction !== 'down') nextDirection = 'up';
+            });
+            
+            leftBtn.addEventListener('click', () => {
+                if (direction !== 'right') nextDirection = 'left';
+            });
+            
+            downBtn.addEventListener('click', () => {
+                if (direction !== 'up') nextDirection = 'down';
+            });
+            
+            rightBtn.addEventListener('click', () => {
+                if (direction !== 'left') nextDirection = 'right';
+            });
+            
+            // Keyboard controls
+            document.addEventListener('keydown', (e) => {
+                switch (e.key) {
+                    case 'ArrowUp':
+                        if (direction !== 'down') nextDirection = 'up';
+                        break;
+                    case 'ArrowDown':
+                        if (direction !== 'up') nextDirection = 'down';
+                        break;
+                    case 'ArrowLeft':
+                        if (direction !== 'right') nextDirection = 'left';
+                        break;
+                    case 'ArrowRight':
+                        if (direction !== 'left') nextDirection = 'right';
+                        break;
+                }
+            });
+            
+            // Start the game
+            gameInterval = setInterval(updateGame, gameSpeed);
+            renderGame();
+        });
     </script>
 </body>
-
 </html>
