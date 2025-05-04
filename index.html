@@ -2,43 +2,63 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Snake Game</title>
     <style>
+        * {
+            box-sizing: border-box;
+            touch-action: manipulation;
+        }
+        
         body {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
+            padding: 10px;
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
+            overflow: hidden;
+        }
+        
+        h1 {
+            margin: 0 0 10px 0;
+            font-size: clamp(20px, 6vw, 28px);
         }
         
         #game-container {
             position: relative;
-            width: 300px;
-            height: 300px;
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 1/1;
             border: 2px solid #333;
             background-color: #fff;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
         
         .snake-part {
             position: absolute;
-            width: 20px;
-            height: 20px;
+            width: calc(100% / 20);
+            height: calc(100% / 20);
             background-color: #4CAF50;
             border: 1px solid #45a049;
+            transition: transform 0.1s ease;
         }
         
         .food {
             position: absolute;
-            width: 20px;
-            height: 20px;
+            width: calc(100% / 20);
+            height: calc(100% / 20);
             background-color: #f44336;
             border-radius: 50%;
+        }
+        
+        #score {
+            margin: 10px 0;
+            font-size: clamp(16px, 5vw, 20px);
+            font-weight: bold;
         }
         
         #controls {
@@ -46,14 +66,16 @@
             grid-template-areas:
                 ". up ."
                 "left down right";
-            gap: 10px;
-            margin-top: 20px;
+            gap: 8px;
+            width: 100%;
+            max-width: 250px;
+            margin-top: 10px;
         }
         
         .arrow-btn {
-            width: 60px;
-            height: 60px;
-            font-size: 24px;
+            width: 100%;
+            aspect-ratio: 1/1;
+            font-size: clamp(16px, 6vw, 24px);
             background-color: #333;
             color: white;
             border: none;
@@ -62,6 +84,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
         
         .arrow-btn:active {
@@ -84,16 +108,70 @@
             grid-area: right;
         }
         
-        #score {
-            margin-top: 20px;
-            font-size: 18px;
-            font-weight: bold;
+        /* Swipe controls for mobile */
+        #swipe-area {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            display: none;
+        }
+        
+        /* Speed controls */
+        #speed-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .speed-btn {
+            padding: 8px 15px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: clamp(14px, 4vw, 16px);
+        }
+        
+        .speed-btn.active {
+            background-color: #4CAF50;
+        }
+        
+        @media (max-width: 600px) {
+            #controls {
+                max-width: 200px;
+            }
+            
+            #swipe-area {
+                display: block;
+            }
+            
+            #speed-controls {
+                gap: 5px;
+            }
+            
+            .speed-btn {
+                padding: 6px 10px;
+            }
         }
     </style>
 </head>
 <body>
     <h1>Snake Game</h1>
-    <div id="game-container"></div>
+    <div id="speed-controls">
+        <button class="speed-btn active" data-speed="200">Slow</button>
+        <button class="speed-btn" data-speed="150">Medium</button>
+        <button class="speed-btn" data-speed="100">Fast</button>
+        <button class="speed-btn" data-speed="70">Turbo</button>
+    </div>
+    <div id="game-container">
+        <div id="swipe-area"></div>
+    </div>
     <div id="score">Score: 0</div>
     <div id="controls">
         <button class="arrow-btn" id="up">↑</button>
@@ -110,20 +188,25 @@
             const leftBtn = document.getElementById('left');
             const downBtn = document.getElementById('down');
             const rightBtn = document.getElementById('right');
+            const swipeArea = document.getElementById('swipe-area');
+            const speedBtns = document.querySelectorAll('.speed-btn');
             
             const gridSize = 20;
-            const containerWidth = gameContainer.clientWidth;
-            const containerHeight = gameContainer.clientHeight;
-            const gridWidth = Math.floor(containerWidth / gridSize);
-            const gridHeight = Math.floor(containerHeight / gridSize);
+            const gridWidth = gridSize;
+            const gridHeight = gridSize;
             
             let snake = [{x: 10, y: 10}];
             let food = generateFood();
             let direction = 'right';
             let nextDirection = 'right';
             let score = 0;
-            let gameSpeed = 150;
-            let gameInterval;
+            let gameSpeed = 150; // Default medium speed
+            let animationFrameId;
+            let lastRenderTime = 0;
+            
+            // Touch controls variables
+            let touchStartX = 0;
+            let touchStartY = 0;
             
             function generateFood() {
                 let foodPosition;
@@ -166,7 +249,7 @@
                 }
                 
                 // Check for collision with self
-                if (snake.some(part => part.x === head.x && part.y === head.y)) {
+                if (snake.some(part => part.x === head.x && part.y === head.y && part !== snake[0])) {
                     gameOver();
                     return;
                 }
@@ -179,13 +262,6 @@
                     score += 10;
                     scoreDisplay.textContent = `Score: ${score}`;
                     food = generateFood();
-                    
-                    // Increase speed slightly every 50 points
-                    if (score % 50 === 0 && gameSpeed > 50) {
-                        gameSpeed -= 10;
-                        clearInterval(gameInterval);
-                        gameInterval = setInterval(updateGame, gameSpeed);
-                    }
                 } else {
                     // Remove tail if no food eaten
                     snake.pop();
@@ -197,13 +273,20 @@
             function renderGame() {
                 // Clear game container
                 gameContainer.innerHTML = '';
+                gameContainer.appendChild(swipeArea); // Re-add swipe area
+                
+                // Calculate cell size based on current container dimensions
+                const cellWidth = gameContainer.clientWidth / gridWidth;
+                const cellHeight = gameContainer.clientHeight / gridHeight;
                 
                 // Render snake
                 snake.forEach((part, index) => {
                     const snakePart = document.createElement('div');
                     snakePart.className = 'snake-part';
-                    snakePart.style.left = `${part.x * gridSize}px`;
-                    snakePart.style.top = `${part.y * gridSize}px`;
+                    snakePart.style.width = `${cellWidth}px`;
+                    snakePart.style.height = `${cellHeight}px`;
+                    snakePart.style.left = `${part.x * cellWidth}px`;
+                    snakePart.style.top = `${part.y * cellHeight}px`;
                     
                     // Make head slightly different
                     if (index === 0) {
@@ -216,13 +299,15 @@
                 // Render food
                 const foodElement = document.createElement('div');
                 foodElement.className = 'food';
-                foodElement.style.left = `${food.x * gridSize}px`;
-                foodElement.style.top = `${food.y * gridSize}px`;
+                foodElement.style.width = `${cellWidth}px`;
+                foodElement.style.height = `${cellHeight}px`;
+                foodElement.style.left = `${food.x * cellWidth}px`;
+                foodElement.style.top = `${food.y * cellHeight}px`;
                 gameContainer.appendChild(foodElement);
             }
             
             function gameOver() {
-                clearInterval(gameInterval);
+                cancelAnimationFrame(animationFrameId);
                 alert("خسرتي يا عزة");
                 resetGame();
             }
@@ -232,12 +317,33 @@
                 direction = 'right';
                 nextDirection = 'right';
                 score = 0;
-                gameSpeed = 150;
                 scoreDisplay.textContent = `Score: ${score}`;
                 food = generateFood();
-                clearInterval(gameInterval);
-                gameInterval = setInterval(updateGame, gameSpeed);
-                renderGame();
+                startGame();
+            }
+            
+            function startGame() {
+                if (animationFrameId) {
+                    cancelAnimationFrame(animationFrameId);
+                }
+                lastRenderTime = 0;
+                animationFrameId = requestAnimationFrame(gameLoop);
+            }
+            
+            function gameLoop(currentTime) {
+                animationFrameId = requestAnimationFrame(gameLoop);
+                
+                if (!lastRenderTime) {
+                    lastRenderTime = currentTime;
+                }
+                
+                const secondsSinceLastRender = (currentTime - lastRenderTime) / 1000;
+                if (secondsSinceLastRender < 1 / (1000 / gameSpeed)) {
+                    return;
+                }
+                
+                lastRenderTime = currentTime;
+                updateGame();
             }
             
             // Event listeners for arrow buttons
@@ -275,9 +381,62 @@
                 }
             });
             
+            // Touch controls for mobile
+            swipeArea.addEventListener('touchstart', (e) => {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+            }, { passive: true });
+            
+            swipeArea.addEventListener('touchmove', (e) => {
+                if (!touchStartX || !touchStartY) return;
+                
+                const touchEndX = e.touches[0].clientX;
+                const touchEndY = e.touches[0].clientY;
+                
+                const diffX = touchStartX - touchEndX;
+                const diffY = touchStartY - touchEndY;
+                
+                // Determine swipe direction
+                if (Math.abs(diffX) > Math.abs(diffY)) {
+                    // Horizontal swipe
+                    if (diffX > 0 && direction !== 'right') {
+                        nextDirection = 'left';
+                    } else if (diffX < 0 && direction !== 'left') {
+                        nextDirection = 'right';
+                    }
+                } else {
+                    // Vertical swipe
+                    if (diffY > 0 && direction !== 'down') {
+                        nextDirection = 'up';
+                    } else if (diffY < 0 && direction !== 'up') {
+                        nextDirection = 'down';
+                    }
+                }
+                
+                touchStartX = 0;
+                touchStartY = 0;
+                e.preventDefault();
+            }, { passive: false });
+            
+            // Speed controls
+            speedBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Remove active class from all buttons
+                    speedBtns.forEach(b => b.classList.remove('active'));
+                    // Add active class to clicked button
+                    btn.classList.add('active');
+                    // Update game speed
+                    gameSpeed = parseInt(btn.dataset.speed);
+                });
+            });
+            
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                renderGame();
+            });
+            
             // Start the game
-            gameInterval = setInterval(updateGame, gameSpeed);
-            renderGame();
+            startGame();
         });
     </script>
 </body>
